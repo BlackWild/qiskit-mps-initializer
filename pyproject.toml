@@ -7,8 +7,18 @@ authors = [
     { name = "Siavash Davani", email = "siavash.davani@uni-jena.de" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "qiskit>=2.0.1",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.131.20",
+    "pyright>=1.1.400",
+    "pytest>=8.3.5",
+    "ruff>=0.11.10",
+]
