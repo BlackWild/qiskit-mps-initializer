@@ -1,9 +1,27 @@
 [lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 
+# Specify the docstring style to be used for linting.
 pydocstyle.convention = "google"
 
 [format]
 # Enable auto-formatting of code examples in docstrings.
 docstring-code-format = true
+# Specify the line ending for formatting.
+line-ending = "lf"
