@@ -1,7 +1,14 @@
 [project]
 name = "qiskit-mps-initializer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Wavefunction initializers for Qiskit based of matrix product states (MPS)"
 readme = "README.md"
+authors = [
+    { name = "Siavash Davani", email = "siavash.davani@uni-jena.de" }
+]
 requires-python = ">=3.13"
 dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
