@@ -1,0 +1,2 @@
+class MPSInitializer:
+    pass
