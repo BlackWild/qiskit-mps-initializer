@@ -6,7 +6,7 @@ import quimb.gates as gates
 import quimb.tensor as qtn
 import scipy
 
-from qiskit_mps_initializer.types.Types import complex_array
+from qiskit_mps_initializer.utils.types import complex_array
 
 
 def bond2_mps_approximation(psi: complex_array) -> qtn.MatrixProductState:

@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 import sympy
 
-from qiskit_mps_initializer.types.Types import complex_array
+from qiskit_mps_initializer.utils.types import complex_array
 
 # custom types
 

@@ -5,8 +5,8 @@ import numpy as np
 import pydantic
 import qiskit
 
-from qiskit_mps_initializer.datatypes.QuantumState import QuantumState
-from qiskit_mps_initializer.types.Types import complex_array, real_array
+from qiskit_mps_initializer.datatypes.quantum_state import QuantumState
+from qiskit_mps_initializer.utils.types import complex_array, real_array
 
 
 class PhasePreparedSignal(pydantic.BaseModel):

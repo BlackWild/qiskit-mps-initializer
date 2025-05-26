@@ -6,3 +6,9 @@ dist
 
 # Python cache
 __pycache__
+
+# pytest cache
+.pytest_cache
+
+# hypothesis database
+.hypothesis

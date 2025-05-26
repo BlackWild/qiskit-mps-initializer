@@ -4,10 +4,10 @@ import numpy as np
 import pydantic
 import qiskit
 
-from qiskit_mps_initializer.helpers.MPSTechnique import (
+from qiskit_mps_initializer.helpers.mps_technique import (
     multi_layered_circuit_for_non_approximated,
 )
-from qiskit_mps_initializer.types.Types import complex_array
+from qiskit_mps_initializer.utils.types import complex_array
 
 
 class QuantumState(pydantic.BaseModel):
