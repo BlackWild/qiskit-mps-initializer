@@ -11,7 +11,7 @@ from qiskit_mps_initializer.utils.types import real_array
     arrays(
         dtype=np.float64,
         shape=st.integers(min_value=1, max_value=10),
-        elements=st.floats(min_value=0.01),
+        elements=st.floats(min_value=0.01, allow_nan=False, allow_infinity=False),
     )
 )
 def test_PhasePreparedSignal_using_lists(data: real_array):

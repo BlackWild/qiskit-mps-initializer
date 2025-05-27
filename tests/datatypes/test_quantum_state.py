@@ -8,8 +8,14 @@ from qiskit_mps_initializer.utils.types import complex_array
 
 
 @given(
-    arrays(dtype=np.complex128, shape=st.integers(min_value=1, max_value=10)),
-    st.integers(min_value=1, max_value=1),
+    arrays(
+        dtype=np.complex128,
+        shape=st.integers(min_value=1, max_value=10),
+        elements=st.complex_numbers(
+            min_magnitude=0.01, allow_nan=False, allow_infinity=False
+        ),
+    ),
+    st.just(1),  # TODO: change this to a strategy for number_of_layers
 )
 def test_QuantumState_using_arrays(
     data: complex_array | list[float], number_of_layers: int
