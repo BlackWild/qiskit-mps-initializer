@@ -16,6 +16,9 @@ select = [
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
+unfixable = [
+    "F401", # 'imported but unused'
+]
 
 # Specify the docstring style to be used for linting.
 pydocstyle.convention = "google"
