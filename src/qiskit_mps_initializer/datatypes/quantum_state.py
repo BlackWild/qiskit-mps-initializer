@@ -11,8 +11,12 @@ from qiskit_mps_initializer.utils.types import complex_array
 
 
 class QuantumState(pydantic.BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+    # Pydantic model configuration
+    model_config = pydantic.ConfigDict(
+        {
+            "arbitrary_types_allowed": True,
+        }
+    )
 
     def __init__(self, data: complex_array | list[float], number_of_layers: int):
         super().__init__()

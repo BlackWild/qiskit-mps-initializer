@@ -10,8 +10,12 @@ from qiskit_mps_initializer.utils.types import complex_array, real_array
 
 
 class PhasePreparedSignal(pydantic.BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+    # Pydantic model configuration
+    model_config = pydantic.ConfigDict(
+        {
+            "arbitrary_types_allowed": True,
+        }
+    )
 
     def __init__(self, quantum_state: QuantumState, alpha: float):
         super().__init__()

@@ -1,14 +1,23 @@
-import pytest
-from hypothesis import given, strategies as st
+import numpy as np
+from hypothesis import given
+from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
+from qiskit_mps_initializer.datatypes.phase_prepared_signal import PhasePreparedSignal
+from qiskit_mps_initializer.utils.types import real_array
 
-# @given(st.lists(st.floats() | st.complex_numbers() | st.integers()), st.floats())
-# def test_PhasePreparedSignal_using_lists(signal, alpha):
-#     from qiskit_mps_initializer.datatypes.PhasePreparedSignal import PhasePreparedSignal
 
-#     # Create an instance of PhasePreparedSignal
-#     signal = PhasePreparedSignal(quantum_signal=signal, alpha)
+@given(
+    arrays(
+        dtype=np.float64,
+        shape=st.integers(min_value=1, max_value=10),
+        elements=st.floats(min_value=0.01),
+    )
+)
+def test_PhasePreparedSignal_using_lists(data: real_array):
+    # Create an instance of PhasePreparedSignal
+    signal = PhasePreparedSignal.from_dense_data(data, 1)
 
-#     # Check if the instance is created successfully
-#     assert isinstance(signal, PhasePreparedSignal)
+    # Validate the properties
+    assert isinstance(signal, PhasePreparedSignal)
+    assert signal.size == len(data)
