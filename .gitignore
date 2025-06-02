@@ -12,3 +12,6 @@ __pycache__
 
 # hypothesis database
 .hypothesis
+
+# MacOS specific files
+.DS_Store
