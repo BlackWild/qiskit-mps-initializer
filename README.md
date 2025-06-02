@@ -1,4 +1,4 @@
-## Tools
+### Tools
 
 - Project and dependency manager: `uv`
 - Linter: `ruff`
@@ -7,16 +7,13 @@
 - Unit testing: `pytest` (no Rust-based alternative)
     - Randomization: `hypothesis`
 
-## Dependencies
+### Dependencies
 
 - Quantum circuits: `qiskit`
 - Data modeling & validation: `pydatic`
 - Tensor networks: `quimb`
 
-## TODO
 
-- License it?
-
-## To fix
+## Todo
 
 - remove manually added `# type: ignore` expressions
