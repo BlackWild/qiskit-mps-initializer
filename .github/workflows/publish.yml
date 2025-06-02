@@ -1,0 +1,35 @@
+name: Publish
+
+# on:
+
+jobs:
+  run:
+    name: "Build and publish release"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.6" # Install a specific version of uv.
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install and sync the project
+        run: uv sync
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Build
+        run: uv build
+
+      - name: Publish
+        run: uv publish -t ${{ secrets.PYPI_TOKEN }}
