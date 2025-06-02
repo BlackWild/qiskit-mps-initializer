@@ -25,17 +25,16 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 
-[project.urls]
-Homepage = "https://github.com/BlackWild/qiskit-mps-initializer"
-Source = "https://github.com/BlackWild/qiskit-mps-initializer"
-
-
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.11.5",
     "qiskit>=2.0.1",
     "quimb>=1.11.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/BlackWild/qiskit-mps-initializer"
+Source = "https://github.com/BlackWild/qiskit-mps-initializer"
 
 [dependency-groups]
 dev = [
