@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qiskit-mps-initializer"
-version = "0.1.0"
-description = "Wavefunction initializers for Qiskit based of matrix product states (MPS)"
+version = "0.1.1"
+description = "Wavefunction initializers for Qiskit based on matrix product states (MPS)"
 readme = "README.md"
 authors = [
     { name = "Siavash Davani", email = "siavash.davani@uni-jena.de" }
@@ -48,7 +48,7 @@ lint = [
     "ruff>=0.11.10",
 ]
 quimb = [
-    # "kahypar>=1.3.5", # cannot install this becasue it requires x86_64 architecture
+    # "kahypar>=1.3.5", # cannot install this because it requires x86_64 architecture
     "networkx>=3.4.2",
     "numba>=0.61.2",
     "optuna>=4.3.0",
