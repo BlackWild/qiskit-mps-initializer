@@ -1,11 +1,9 @@
-
 # Qiskit MPS Initializer
 
 ![PyPI - License](https://img.shields.io/pypi/l/qiskit-mps-initializer)
 ![PyPI - Version](https://img.shields.io/pypi/v/qiskit-mps-initializer)
 
 This package provides extra tools on Qiskit enabling you to initialize wavefunctions on a quantum computer using techniques based on matrix product states (MPS).
-
 
 ## User guide
 
@@ -57,7 +55,10 @@ circuit.draw('mpl')
 - Formatter & style: `ruff`
 - Static typechecking: `pyright` (`ty` is currently in beta, `pyrefly` is also another candidate, both built using Rust)
 - Unit testing: `pytest` (no Rust-based alternative)
-    - Randomization: `hypothesis`
+  - Randomization: `hypothesis`
+- Documentation: `mkdocs`
+  - API auto-generation: `mkdocstrings-python`
+  - Theme: `mkdocs-material`
 
 ### Dependencies
 

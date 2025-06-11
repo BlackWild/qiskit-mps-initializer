@@ -1,0 +1,16 @@
+site_name: Docs for qiskit_mps_initializer
+
+theme:
+  name: "material"
+
+nav:
+  - Get Started:
+      - Welcome: index.md
+  - API:
+      - Reference: api/reference.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
