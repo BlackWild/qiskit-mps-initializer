@@ -1,4 +1,4 @@
-site_name: Docs for qiskit_mps_initializer
+site_name: qiskit-mps-initializer
 
 theme:
   name: "material"

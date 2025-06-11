@@ -14,7 +14,11 @@ from qiskit_mps_initializer.utils.types import complex_array
 
 
 class QuantumState(pydantic.BaseModel):
-    """Represents a quantum state."""
+    """Represents a quantum state.
+
+    Attributes:
+        original_data: The original data of the quantum
+    """
 
     # Pydantic model configuration
     model_config = pydantic.ConfigDict(

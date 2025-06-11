@@ -35,7 +35,12 @@ def extract_alpha_and_state_from_intensity_signal(
 
 
 class QuantumIntensity(pydantic.BaseModel):
-    """QuantumIntensity."""
+    """QuantumIntensity.
+
+    Attributes:
+        state: The quantum state.
+        alpha: The alpha value.
+    """
 
     state: QuantumState
     alpha: float

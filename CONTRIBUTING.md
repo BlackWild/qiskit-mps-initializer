@@ -44,3 +44,4 @@ Because the nature of this project is somehow that it involves lots of calculati
 - `typing.Self` was introduced in python `3.11`. Thus we are forced to use `3.11` at the moment.
 - would it be possible to develop using higher python versions for static typing but release the package by transpling it for lower python versions?
 - do not forget to add `__init__.py` files to all directories of the src folder... otherwise documentation generation won't work.
+- unfortunately, as of today, `ruff` does not have a rule to enforce all the sections like `Arg:` in docstrings. you have to be careful to include all of them manually so that the doc generators extract type information from the code...
