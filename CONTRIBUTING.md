@@ -1,4 +1,3 @@
-
 This project is in alpha phase now. The documentation is not prepared yet. However, there are a few tips down here for anyone wanting to check out the repository.
 
 ## Developer guide
@@ -29,8 +28,11 @@ in the root directory and this will the tests using `pytest` inside the venv.
 
 Because the nature of this project is somehow that it involves lots of calculations on numbers, we use `hypothesis` to randomize the inputs of the tests.
 
-
 ## Development notes
+
+### Pydantic
+
+- it seems defining custom `__init__()` functions for the pydantic models is not the best idea because it messes with the validation procedure of pydantic [Link](https://docs.pydantic.dev/latest/concepts/models/#model-signature). Instead, do not define custom constructors as `__init__()` but `@classmethod`s.
 
 ### Todo
 

@@ -1,30 +1,38 @@
 [lint]
 select = [
-    # pycodestyle
-    "E",
-    # Pyflakes
-    "F",
-    # pyupgrade
-    "UP",
-    # flake8-bugbear
-    "B",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # pyupgrade
+  "UP",
+  # flake8-bugbear
+  "B",
+  # flake8-simplify
+  "SIM",
+  # isort
+  "I",
+  # pydoclint
+  "DOC",
+  # pydocstyle
+  "D",
+]
+ignore = [
+  "E501", # line too long
+  "D202", # No blank lines allowed after function docstring
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = [
-    "F401", # 'imported but unused'
+  "F401", # 'imported but unused'
 ]
 
 # Specify the docstring style to be used for linting.
 pydocstyle.convention = "google"
 
 # longer line limit for comments
-pycodestyle.max-line-length = 100
+# pycodestyle.max-line-length = 100
 
 [format]
 # Enable auto-formatting of code examples in docstrings.
