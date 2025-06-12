@@ -1,11 +1,9 @@
 """QuantumIntensity."""
 
-from typing import Self
-
 import numpy as np
 import numpy.typing as npt
 import pydantic
-import qiskit
+import qiskit.circuit
 
 from qiskit_mps_initializer.datatypes import QuantumState
 from qiskit_mps_initializer.helpers.extractors import (
@@ -15,26 +13,20 @@ from qiskit_mps_initializer.utils.types import real_array
 
 
 class QuantumIntensity(pydantic.BaseModel):
-    """QuantumIntensity.
-
-    Attributes:
-        state: The quantum state.
-        alpha: The alpha value.
-    """
+    """QuantumIntensity."""
 
     state: QuantumState
-    alpha: float
+    """The quantum state corresponding to this intensity signal."""
 
-    # Pydantic model configuration
-    model_config = pydantic.ConfigDict(
-        {
-            "arbitrary_types_allowed": True,
-        }
-    )
+    alpha: float
+    """The alpha parameter of the intensity signal."""
+
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+    """Pydantic model configuration."""
 
     @classmethod
-    def from_dense_data(cls, data: real_array) -> Self:
-        """Initializes the QuantumIntensity from the given dense data."""
+    def from_dense_data(cls, data: real_array) -> "QuantumIntensity":
+        """Initializes a QuantumIntensity from the given dense data."""
 
         alpha, state_data = extract_alpha_and_state_from_intensity_signal(data)
         state = QuantumState.from_dense_data(data=state_data, normalize=False)
@@ -44,28 +36,24 @@ class QuantumIntensity(pydantic.BaseModel):
     @pydantic.computed_field
     @property
     def wavefunction(self) -> npt.NDArray[np.complex128]:
-        """Returns the normalized wavefunction of the quantum state.
-
-        Returns:
-            (npt.NDArray[np.complex128]): The normalized wavefunction.
-        """
+        """The normalized wavefunction of the quantum state."""
         return self.state.wavefunction
 
     @pydantic.computed_field
     @property
     def size(self) -> int:
-        """Returns the dimension of the quantum state."""
+        """The dimension of the quantum state."""
         return self.state.wavefunction.size
 
     @pydantic.computed_field
     @property
     def num_qubits(self) -> int:
-        """Returns the number of qubits required to represent the quantum state."""
+        """The number of qubits required to represent the quantum state."""
         return self.state.num_qubits
 
     def generate_mps_initializer_circuit(
         self, number_of_layers: int
-    ) -> qiskit.QuantumCircuit:
+    ) -> qiskit.circuit.QuantumCircuit:
         """Generates the MPS initializer circuit for the quantum state."""
         return self.state.generate_mps_initializer_circuit(number_of_layers)
 

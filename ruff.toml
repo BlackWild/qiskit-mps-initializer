@@ -22,6 +22,9 @@ ignore = [
   "D202", # No blank lines allowed after function docstring
 ]
 
+# 1. don't auto-sort imports in `__init__.py` files to avoid circular imports
+per-file-ignores = { "**/__init__.py" = ["I"] }
+
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = [

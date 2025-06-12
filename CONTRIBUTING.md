@@ -40,9 +40,17 @@ Because the nature of this project is somehow that it involves lots of calculati
 
 ### Other
 
-- `scipy-stubs`'s python `3.10` requirement is keeping this project's python requirement to go down to `3.9`.
-- `typing.Self` was introduced in python `3.11`. Thus we are forced to use `3.11` at the moment.
 - would it be possible to develop using higher python versions for static typing but release the package by transpling it for lower python versions?
 - do not forget to add `__init__.py` files to all directories of the src folder... otherwise documentation generation won't work.
 - unfortunately, as of today, `ruff` does not have a rule to enforce all the sections like `Arg:` in docstrings. you have to be careful to include all of them manually so that the doc generators extract type information from the code...
 - defining `__all__` variable in `__init__.py` files enables better importability of objects in from the submodules i.e. `from ... import ...`
+- be careful about order of the imports in the `__init.__py` files, avoiding circular imports
+
+#### Older notes
+
+##### Python compatibility
+
+- `typing.Self` is not helpful anyways because `mkdocs` has troubles resolving `Self` to the actual class.
+
+- ~~`scipy-stubs`'s python `3.10` requirement is keeping this project's python requirement to go down to `3.9`.~~
+- ~~`typing.Self` was introduced in python `3.11`. Thus we are forced to use `3.11` at the moment.~~

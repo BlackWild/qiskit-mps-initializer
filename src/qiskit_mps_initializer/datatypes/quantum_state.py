@@ -1,11 +1,10 @@
 """QuantumState."""
 
-from typing import Self
-
 import numpy as np
 import numpy.typing as npt
 import pydantic
 import qiskit
+import qiskit.circuit
 
 from qiskit_mps_initializer.helpers.mps_technique import (
     multi_layered_circuit_for_non_approximated,
@@ -14,23 +13,18 @@ from qiskit_mps_initializer.utils.types import complex_array
 
 
 class QuantumState(pydantic.BaseModel):
-    """Represents a quantum state.
-
-    Attributes:
-        original_data: The original data of the quantum
-    """
-
-    # Pydantic model configuration
-    model_config = pydantic.ConfigDict(
-        {
-            "arbitrary_types_allowed": True,
-        }
-    )
+    """Represents a quantum state."""
 
     original_data: npt.NDArray[np.complex128]
+    """The original data of the quantum state."""
+
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+    """Pydantic model configuration."""
 
     @classmethod
-    def from_dense_data(cls, data: complex_array, normalize: bool = False) -> Self:
+    def from_dense_data(
+        cls, data: complex_array, normalize: bool = False
+    ) -> "QuantumState":
         """Initializes the QuantumState from the given dense data."""
 
         normalization_factor = np.linalg.norm(data)
@@ -50,25 +44,29 @@ class QuantumState(pydantic.BaseModel):
     @pydantic.computed_field
     @property
     def wavefunction(self) -> npt.NDArray[np.complex128]:
-        """Returns the normalized wavefunction of the quantum state."""
+        """The normalized wavefunction of the quantum state."""
         return self.original_data / self._original_normalization_factor
 
     @pydantic.computed_field
     @property
     def size(self) -> int:
-        """Returns the dimension of the quantum state."""
+        """The dimension of the quantum state."""
         return self.wavefunction.size
 
     @pydantic.computed_field
     @property
     def num_qubits(self) -> int:
-        """Returns the number of qubits required to represent the quantum state."""
+        """The number of qubits required to represent the quantum state."""
         return int(np.log2(self.size))
 
     def generate_mps_initializer_circuit(
         self, number_of_layers: int
-    ) -> qiskit.QuantumCircuit:
-        """Generates the MPS initializer circuit for the quantum state."""
+    ) -> qiskit.circuit.QuantumCircuit:
+        """Generates the MPS initializer circuit for the quantum state.
+
+        Returns:
+            QuantumCircuit: The MPS initializer circuit for the quantum state as a qiskit circuit.
+        """
         circuit = multi_layered_circuit_for_non_approximated(
             self.wavefunction, number_of_layers=number_of_layers
         )

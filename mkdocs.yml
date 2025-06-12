@@ -16,3 +16,43 @@ plugins:
       handlers:
         python:
           paths: [src]
+          options:
+            show_symbol_type_heading: true # indicates `class`, `meth`, `attr`, ...
+            show_symbol_type_toc: true # same indications but in toc
+            members_order: source # order members as they appear in the source file
+            filters:
+              - "!^_" # ignore `_` and `__` members
+              - "!model_config" # ignore pydantic model config
+            show_labels: true # hide the label of the symbol
+
+            ### Docstrings
+            docstring_style: google
+            # docstring_options:
+            #   ignore_init_summary: true
+            docstring_section_style: list
+            # merge_init_into_class: true
+            show_if_no_docstring: true # for now turned this on to avoid missing documentation
+
+            ### Signature
+            show_signature: true # show signatures
+            separate_signature: true # show signature on a separate line, not in header
+            show_signature_annotations: true # show type annotations in signatures
+            signature_crossrefs: true # show indicators for external types
+            show_bases: false # hide parent classes, because not really needed in this package
+
+            ### Extensions
+            extensions:
+              - griffe_pydantic:
+                  schema: false
+
+          inventories:
+            - url: https://docs.python.org/3/objects.inv
+              # domains: [py, std]
+            - url: https://numpy.org/doc/stable/objects.inv
+              # domains: [np]
+            - url: https://docs.scipy.org/doc/scipy/reference/objects.inv
+              # domains: [sp]
+            - url: https://docs.quantum.ibm.com/api/qiskit/objects.inv
+
+watch:
+  - src
