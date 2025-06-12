@@ -14,7 +14,7 @@ from qiskit_mps_initializer.utils.types import real_array
 
 
 class QuantumIntensity(pdnm.NumpyModel):
-    """QuantumIntensity."""
+    """Represents an intensity signal."""
 
     state: QuantumState
     """The quantum state corresponding to this intensity signal."""

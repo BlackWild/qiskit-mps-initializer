@@ -2,11 +2,15 @@ site_name: qiskit-mps-initializer
 
 theme:
   name: "material"
+  features:
+    - navigation.tabs # puts each item in the nav section as tabs in the header
+    - navigation.sections # puts each item in the nav section as sections in the sidebar
 
 nav:
   - Get Started:
       - Welcome: index.md
   - API Reference:
+      - api/index.md
       - Datatypes:
           - api/datatypes/quantum_state.md
           - api/datatypes/quantum_intensity.md

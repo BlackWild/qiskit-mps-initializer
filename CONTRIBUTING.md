@@ -45,6 +45,7 @@ Because the nature of this project is somehow that it involves lots of calculati
 - unfortunately, as of today, `ruff` does not have a rule to enforce all the sections like `Arg:` in docstrings. you have to be careful to include all of them manually so that the doc generators extract type information from the code...
 - defining `__all__` variable in `__init__.py` files enables better importability of objects in from the submodules i.e. `from ... import ...`
 - be careful about order of the imports in the `__init.__py` files, avoiding circular imports
+- `pydantic` does not support `numpy` arrays. I am using a class `pydantic_numpy.NumpyModel` instead of `pydantic.BaseModel` to enable the support.
 
 #### Older notes
 
