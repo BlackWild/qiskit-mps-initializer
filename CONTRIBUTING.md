@@ -50,6 +50,7 @@ Because the nature of this project is somehow that it involves lots of calculati
 
 ##### Python compatibility
 
+- going down to `3.10`...
 - `typing.Self` is not helpful anyways because `mkdocs` has troubles resolving `Self` to the actual class.
 
 - ~~`scipy-stubs`'s python `3.10` requirement is keeping this project's python requirement to go down to `3.9`.~~

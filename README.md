@@ -2,6 +2,7 @@
 
 ![PyPI - License](https://img.shields.io/pypi/l/qiskit-mps-initializer)
 ![PyPI - Version](https://img.shields.io/pypi/v/qiskit-mps-initializer)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qiskit-mps-initializer)
 
 This package provides extra tools on Qiskit enabling you to initialize wavefunctions on a quantum computer using techniques based on matrix product states (MPS).
 

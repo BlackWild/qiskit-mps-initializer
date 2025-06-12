@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.11.5",
     "qiskit>=2.0.1",
