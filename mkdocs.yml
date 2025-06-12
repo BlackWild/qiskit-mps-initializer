@@ -6,8 +6,10 @@ theme:
 nav:
   - Get Started:
       - Welcome: index.md
-  - API:
-      - Reference: api/reference.md
+  - API Reference:
+      - Datatypes:
+          - api/datatypes/quantum_state.md
+          - api/datatypes/quantum_intensity.md
 
 plugins:
   - mkdocstrings:

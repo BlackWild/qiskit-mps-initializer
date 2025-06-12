@@ -6,10 +6,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
-from qiskit_mps_initializer.datatypes.quantum_intensity import (
-    QuantumIntensity,
-)
-from qiskit_mps_initializer.datatypes.quantum_state import QuantumState
+from qiskit_mps_initializer.datatypes import QuantumIntensity, QuantumState
 
 
 @given(

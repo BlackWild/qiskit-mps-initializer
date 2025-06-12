@@ -1,7 +1,7 @@
 import qiskit
 import qiskit.circuit
 
-from qiskit_mps_initializer.datatypes.quantum_state import QuantumState
+from qiskit_mps_initializer.datatypes import QuantumState
 
 
 class MPSInitializer:
