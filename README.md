@@ -65,4 +65,5 @@ circuit.draw('mpl')
 
 - Quantum circuits: `qiskit`
 - Data modeling & validation: `pydatic`
+  - Numpy support: `pydantic-numpy`
 - Tensor networks: `quimb`

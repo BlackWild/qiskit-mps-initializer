@@ -38,7 +38,7 @@ plugins:
             separate_signature: true # show signature on a separate line, not in header
             show_signature_annotations: true # show type annotations in signatures
             signature_crossrefs: true # show indicators for external types
-            show_bases: false # hide parent classes, because not really needed in this package
+            show_bases: true # hide parent classes, because not really needed in this package
 
             ### Extensions
             extensions:

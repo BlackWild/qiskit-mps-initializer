@@ -37,6 +37,7 @@ Homepage = "https://github.com/BlackWild/qiskit-mps-initializer"
 
 [dependency-groups]
 dev = [
+    "pydantic-numpy>=8.0.1",
     "scipy-stubs>=1.15.3.0",
 ]
 test = [
