@@ -41,8 +41,9 @@ circuit = state.mps_initializer_circuit
 circuit.draw('mpl')
 ```
 
-> [!IMPORTANT]
-> Note that the documentation of this package is in preparation now and will be linked here. Until then, you can check out the source code to get an idea of functions and classes exported in this package.
+### Documentation
+
+The project's documentation is located [here](https://blackwild.github.io/qiskit-mps-initializer/). Check it out for more information.
 
 > [!CAUTION]
 > This project is in alpha. This means you should expect drastic changes in the api in later releases.
