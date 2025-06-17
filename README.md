@@ -23,7 +23,7 @@ You can alternatively use `uv`, `poetry` or any other python package manager to 
 Once you have installed the package, you can import tools from it.
 
 ```python
-from qiskit_mps_initializer.datatypes.quantum_state import QuantumState
+from qiskit_mps_initializer.datatypes import QuantumState
 
 # wavefunction as an array of numbers, could use np.array as well
 psi = [1, 3, 1, 2, 7, 8, 0, 1]
@@ -31,10 +31,10 @@ psi = [1, 3, 1, 2, 7, 8, 0, 1]
 number_of_mps_layers = 2
 
 # create the state object
-state = QuantumState(data=psi, number_of_layers=number_of_mps_layers)
+state = QuantumState.from_dense_data(data=psi, normalize=True)
 
 # generate the initializer circuit for this state
-circuit = state.mps_initializer_circuit
+circuit = state.generate_mps_initializer_circuit(number_of_layers=number_of_mps_layers)
 
 # the circuit object is a qiskit.QuantumCircuit object which
 # means you can do whatever you could natively do in Qiskit
