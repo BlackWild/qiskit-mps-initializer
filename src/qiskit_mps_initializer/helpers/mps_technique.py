@@ -1,3 +1,5 @@
+"""Helper functions for the MPS technique."""
+
 import numpy as np
 import qiskit
 import qiskit.circuit
@@ -29,47 +31,62 @@ def bond2_mps_approximation(psi: complex_array) -> qtn.MatrixProductState:
     # ensure left-physical-right order of the indices
     mps.permute_arrays(shape="lpr")
 
-    # TODO: the following can probably be improved by constructing a final layer with only a few two-qubit gates instead of forcing all to be two-qubit
-
-    # check if any of the bond sizes are 1
-    bond_sizes = mps.bond_sizes()
-    if any([bond_size != 2 for bond_size in bond_sizes]):
-        raise ValueError(
-            "The bond sizes of the MPS should be exactly 2. The bond sizes were: \n"
-            + str(bond_sizes)
-        )
-
     return mps
 
 
 def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
     # TODO: things probably can be done more efficiently in terms of not transposing data around and working properly in the numpy realm
 
+    # TODO: properly document this
+
     G = []
 
-    # G_first
-    A0: quimb.tensor.Tensor = mps[0]  # type: ignore
+    # The following code calculates the first G matrix from the first A tensor.
+    # The first A tensor is either of the shape (2, 1) or (2, 2).
+    A0: qtn.Tensor = mps[0]  # type: ignore
+    # In both cases, the following code creates the corresponding G matrix. Note that in case of a (2, 1) tensor, the flattened vector is of size 2 and the null space has 1 element, and in case of a (2, 2) tensor, the flattened vector is of size 4 and the null space has 3 elements.
     A0_vec = np.array([A0.data.flatten()])
     G0 = np.concatenate((A0_vec.T, scipy.linalg.null_space(A0_vec).conjugate()), axis=1)
     G.append(G0)
 
-    # G_middle
+    # The following code calculates the middle G matrices from the A tensors.
+    # The middle A tensors can be of the shape (2, 2, 2), (2, 2, 1), (1, 2, 2), or (1, 2, 1).
     for i in range(1, mps.num_tensors - 1):
-        Ai: quimb.tensor.Tensor = mps[i]  # type: ignore
+        Ai: qtn.Tensor = mps[i]  # type: ignore
         Ai_a_0 = Ai.data[0, :, :].flatten()
-        Ai_a_1 = Ai.data[1, :, :].flatten()
-        Gi_incomplete = np.array([Ai_a_0, Ai_a_1])
+        if Ai.data.shape[0] == 2:
+            Ai_a_1 = Ai.data[1, :, :].flatten()
+            Gi_incomplete = np.array([Ai_a_0, Ai_a_1])
+        else:
+            Gi_incomplete = np.array([Ai_a_0])
+
         Gi = np.concatenate(
             (Gi_incomplete.T, scipy.linalg.null_space(Gi_incomplete).conjugate()),
             axis=1,
         )
-        Gi = Gi @ np.real(gates.SWAP)
+
+        if Ai.data.shape[2] == 2:
+            Gi = Gi @ np.real(gates.SWAP)
+
         G.append(Gi)
 
-    # G_last
+    # The following code calculates the last G matrix from the last A tensor.
+    # The last A tensor is of the shape (2, 2) or (1, 2).
     AN: quimb.tensor.Tensor = mps[-1]  # type: ignore
-    G_last = AN.data.T
-    G.append(G_last)
+    if AN.data.shape[0] == 2:
+        G_last = AN.data.T
+        G.append(G_last)
+    else:
+        A_last_a_0 = AN.data[0, :].flatten()
+        G_last_incomplete = np.array([A_last_a_0])
+        G_last = np.concatenate(
+            (
+                G_last_incomplete.T,
+                scipy.linalg.null_space(G_last_incomplete).conjugate(),
+            ),
+            axis=1,
+        )
+        G.append(G_last)
 
     # TODO: maybe also check the equivalence of the product of the G matrices with the original MPS
 
@@ -109,9 +126,12 @@ def multi_layered_circuit_for_non_approximated(
 
         current_layer_circuit = qiskit.QuantumCircuit(number_of_qubits)
         for i in range(len(G) - 1):
-            current_layer_circuit.unitary(
-                G[i], [number_of_qubits - 1 - i - 1, number_of_qubits - 1 - i]
-            )
+            if G[i].shape == (4, 4):
+                current_layer_circuit.unitary(
+                    G[i], [number_of_qubits - 1 - i - 1, number_of_qubits - 1 - i]
+                )
+            elif G[i].shape == (2, 2):
+                current_layer_circuit.unitary(G[i], number_of_qubits - 1 - i)
         current_layer_circuit.unitary(G[-1], [0])
 
         layers.append(current_layer_circuit)
