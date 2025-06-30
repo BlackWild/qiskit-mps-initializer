@@ -21,6 +21,8 @@ select = [
   "DOC",
   # pydocstyle
   "D",
+  # type-checking
+  "TC",
 ]
 ignore = [
   "E501", # line too long
