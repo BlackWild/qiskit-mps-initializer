@@ -1,6 +1,7 @@
 """Helper functions for the MPS technique."""
 
 import numpy as np
+import numpy.typing as npt
 import qiskit
 import qiskit.circuit
 import quimb
@@ -35,60 +36,57 @@ def bond2_mps_approximation(psi: complex_array) -> qtn.MatrixProductState:
 
 
 def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
-    # TODO: things probably can be done more efficiently in terms of not transposing data around and working properly in the numpy realm
+    # make sure the maximum bond dimension is maximally 2 or there is only one tensor
+    # TODO: throw error
+    assert mps.num_tensors == 1 or mps.max_bond() <= 2
 
-    # TODO: properly document this
+    # expand the bond dimension to 2 for easier handling of edge cases (when a bond dimension is 1)
+    mps.expand_bond_dimension(2)
 
+    # we start with an empty list of G matrices
     G = []
 
-    # The following code calculates the first G matrix from the first A tensor.
-    # The first A tensor is either of the shape (2, 1) or (2, 2).
-    A0: qtn.Tensor = mps[0]  # type: ignore
-    # In both cases, the following code creates the corresponding G matrix. Note that in case of a (2, 1) tensor, the flattened vector is of size 2 and the null space has 1 element, and in case of a (2, 2) tensor, the flattened vector is of size 4 and the null space has 3 elements.
-    A0_vec = np.array([A0.data.flatten()])
-    G0 = np.concatenate((A0_vec.T, scipy.linalg.null_space(A0_vec).conjugate()), axis=1)
-    G.append(G0)
+    # then we go for finding the matrices. if there is only one site, then we just have to find the final G matrix which is a one-qubit gate. otherwise, we first find the other g matrices which are two-qubit gates
+    if mps.num_tensors > 1:
+        # the matrix reshaped as a 4x1 column vector
+        A0_vec = mps[0].data.copy().reshape(4, 1)
+        # the null space of the vector (we transpose the column vector to a row vector to get the null space as a 4x3 matrix)
+        null_space = scipy.linalg.null_space(A0_vec.T)
+        # the G matrix is the concatenation of the 4x1 vector and 4x3 null space matrix. note that the null space matrix is complex conjugated because A0_vec*null_space = 0 thus null_space actually already includes complex conjugated elements
+        G0 = np.column_stack((A0_vec, null_space.conjugate()))
 
-    # The following code calculates the middle G matrices from the A tensors.
-    # The middle A tensors can be of the shape (2, 2, 2), (2, 2, 1), (1, 2, 2), or (1, 2, 1).
-    for i in range(1, mps.num_tensors - 1):
-        Ai: qtn.Tensor = mps[i]  # type: ignore
-        Ai_a_0 = Ai.data[0, :, :].flatten()
-        if Ai.data.shape[0] == 2:
-            Ai_a_1 = Ai.data[1, :, :].flatten()
-            Gi_incomplete = np.array([Ai_a_0, Ai_a_1])
-        else:
-            Gi_incomplete = np.array([Ai_a_0])
+        G.append(G0)
 
-        Gi = np.concatenate(
-            (Gi_incomplete.T, scipy.linalg.null_space(Gi_incomplete).conjugate()),
-            axis=1,
-        )
+        for i in range(1, mps.num_tensors - 1):
+            Ai_a_0 = mps[i].data[0, :, :].copy().reshape(4, 1)
+            Ai_a_1 = mps[i].data[1, :, :].copy().reshape(4, 1)
+            Gi_incomplete = np.column_stack((Ai_a_0, Ai_a_1))
 
-        if Ai.data.shape[2] == 2:
+            null_space = scipy.linalg.null_space(Gi_incomplete.T)
+
+            # if Ai.data.shape[0] == 2:
+            #     Ai_a_1 = Ai.data[1, :, :].flatten()
+            #     Gi_incomplete = np.array([Ai_a_0, Ai_a_1])
+            # else:
+            #     Gi_incomplete = np.array([Ai_a_0])
+
+            Gi = np.column_stack((Gi_incomplete, null_space.conjugate()))
+
             Gi = Gi @ np.real(gates.SWAP)
 
-        G.append(Gi)
+            G.append(Gi)
 
-    # The following code calculates the last G matrix from the last A tensor.
-    # The last A tensor is of the shape (2, 2) or (1, 2).
-    AN: quimb.tensor.Tensor = mps[-1]  # type: ignore
-    if AN.data.shape[0] == 2:
-        G_last = AN.data.T
-        G.append(G_last)
-    else:
-        A_last_a_0 = AN.data[0, :].flatten()
-        G_last_incomplete = np.array([A_last_a_0])
-        G_last = np.concatenate(
-            (
-                G_last_incomplete.T,
-                scipy.linalg.null_space(G_last_incomplete).conjugate(),
-            ),
-            axis=1,
-        )
-        G.append(G_last)
+    # TODO: the following part still does not support only one site since the A tensor will just be a vector in this case with just one physical index. to check this out update the corresponding test in test_mps_technique.py to include one site only and fix this in code
 
-    # TODO: maybe also check the equivalence of the product of the G matrices with the original MPS
+    # the following code calculates the last G matrix from the last A tensor.
+    # the last A tensor is of the shape (2, 2) or (1, 2).
+    G_last = mps[-1].data.copy().T
+    # sometimes if it was (1, 2), the initial expansion to bond 2 creates a zero vector as the second column. the following code fixes this by substituting the zero vector with a vector orthogonal to the first column
+    if np.allclose(G_last[:, 1], [0, 0]):
+        new_vec_1 = scipy.linalg.null_space([G_last[:, 0].T.conjugate()])
+        G_last = np.column_stack((G_last[:, 0], new_vec_1))
+
+    G.append(G_last)
 
     return G
 
@@ -134,6 +132,11 @@ def multi_layered_circuit_for_non_approximated(
                 current_layer_circuit.unitary(G[i], number_of_qubits - 1 - i)
         current_layer_circuit.unitary(G[-1], [0])
 
+        unitary = qiskit.quantum_info.Operator.from_circuit(current_layer_circuit).data
+
+        current_psi = unitary.conjugate().T @ current_psi
+        current_psi = current_psi / np.linalg.norm(current_psi)
+
         layers.append(current_layer_circuit)
 
     # the order of the construction of the layers is the reverse of the order of the application of them in the implementation
@@ -147,3 +150,41 @@ def multi_layered_circuit_for_non_approximated(
     )
 
     return circuit
+
+
+# def multilayer_qiskit_initializer_circuit_for_non_approximated_state(
+#     target_psi: npt.NDArray[np.complexfloating],
+#     max_number_of_layers: int,
+#     atol: float = 1e-8,
+# ) -> qiskit.circuit.QuantumCircuit:
+#     qubit_num = np.log2(len(target_psi))
+#     assert qubit_num.is_integer(), "The state vector must have a size of 2^n."
+
+#     circuit = qiskit.QuantumCircuit(qubit_num)
+
+#     current_psi = np.zeros(len(target_psi))
+#     current_psi[0] = 1
+
+#     while np.linalg.norm(current_psi - target_psi) > atol:
+#         mps = bond2_mps_approximation(current_psi)
+#         G_matrices = G_matrices(mps)
+
+#         pass
+#         # current_psi = np.dot(current_psi, G)
+#         # circuit.append(one_layer_gates_for_bond2_approximated(G), range(qubit_num))
+
+#     return circuit
+
+
+# def recursive():
+#     pass
+
+
+# def multilayer_mpo_matrices_for_non_approximated_state(
+#     psi: complex_array, max_number_of_layers: int, atol: float = 1e-8
+# ) -> npt.NDArray[np.complexfloating]:
+#     # Start with the zero state
+#     current_psi = np.zeros(len(psi))
+#     current_psi[0] = 1
+
+#     raise NotImplementedError
