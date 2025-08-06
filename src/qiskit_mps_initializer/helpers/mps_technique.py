@@ -2,17 +2,17 @@
 
 import numpy as np
 import numpy.typing as npt
+import pydantic_numpy.typing as pdnt
 import qiskit
 import qiskit.circuit
+import qiskit.quantum_info
 import quimb
 import quimb.gates as gates
 import quimb.tensor as qtn
 import scipy
 
-from qiskit_mps_initializer.utils.types import complex_array
 
-
-def bond2_mps_approximation(psi: complex_array) -> qtn.MatrixProductState:
+def bond2_mps_approximation(psi: npt.ArrayLike) -> qtn.MatrixProductState:
     if not np.isclose(np.linalg.norm(psi), 1.0):
         raise ValueError(
             "The state vector must be normalized. The norm was: "
@@ -35,10 +35,15 @@ def bond2_mps_approximation(psi: complex_array) -> qtn.MatrixProductState:
     return mps
 
 
-def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
+def G_matrices(mps: qtn.MatrixProductState) -> list[pdnt.Np2DArrayComplex64]:
     # make sure the maximum bond dimension is maximally 2 or there is only one tensor
-    # TODO: throw error
-    assert mps.num_tensors == 1 or mps.max_bond() <= 2
+    max_bond = mps.max_bond()
+    if max_bond == None: # there is no bond therefore there is only one site
+        raise ValueError("This function does not support one-site MPS yet.")
+    if max_bond > 2:
+        raise ValueError(
+            "The maximum bond dimension of the MPS must be 2"
+        )
 
     # expand the bond dimension to 2 for easier handling of edge cases (when a bond dimension is 1)
     mps.expand_bond_dimension(2)
@@ -48,8 +53,9 @@ def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
 
     # then we go for finding the matrices. if there is only one site, then we just have to find the final G matrix which is a one-qubit gate. otherwise, we first find the other g matrices which are two-qubit gates
     if mps.num_tensors > 1:
+        tensor_data: pdnt.Np2DArrayComplex64 = mps[0].data.copy()  # type: ignore
         # the matrix reshaped as a 4x1 column vector
-        A0_vec = mps[0].data.copy().reshape(4, 1)
+        A0_vec = tensor_data.reshape(4, 1)
         # the null space of the vector (we transpose the column vector to a row vector to get the null space as a 4x3 matrix)
         null_space = scipy.linalg.null_space(A0_vec.T)
         # the G matrix is the concatenation of the 4x1 vector and 4x3 null space matrix. note that the null space matrix is complex conjugated because A0_vec*null_space = 0 thus null_space actually already includes complex conjugated elements
@@ -58,8 +64,10 @@ def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
         G.append(G0)
 
         for i in range(1, mps.num_tensors - 1):
-            Ai_a_0 = mps[i].data[0, :, :].copy().reshape(4, 1)
-            Ai_a_1 = mps[i].data[1, :, :].copy().reshape(4, 1)
+            Ai_a_0_data: pdnt.Np2DArrayComplex64 = mps[i].data[0, :, :].copy()  # type: ignore
+            Ai_a_0 = Ai_a_0_data.reshape(4, 1)
+            Ai_a_1_data: pdnt.Np2DArrayComplex64 = mps[i].data[1, :, :].copy()  # type: ignore
+            Ai_a_1 = Ai_a_1_data.reshape(4, 1)
             Gi_incomplete = np.column_stack((Ai_a_0, Ai_a_1))
 
             null_space = scipy.linalg.null_space(Gi_incomplete.T)
@@ -80,7 +88,8 @@ def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
 
     # the following code calculates the last G matrix from the last A tensor.
     # the last A tensor is of the shape (2, 2) or (1, 2).
-    G_last = mps[-1].data.copy().T
+    G_last_data: pdnt.Np2DArrayComplex64 = mps[-1].data.copy()  # type: ignore
+    G_last = G_last_data.T
     # sometimes if it was (1, 2), the initial expansion to bond 2 creates a zero vector as the second column. the following code fixes this by substituting the zero vector with a vector orthogonal to the first column
     if np.allclose(G_last[:, 1], [0, 0]):
         new_vec_1 = scipy.linalg.null_space([G_last[:, 0].T.conjugate()])
@@ -92,14 +101,14 @@ def G_matrices(mps: qtn.MatrixProductState) -> list[complex_array]:
 
 
 def one_layer_gates_for_bond2_approximated(
-    G: list[complex_array],
+    G: list[pdnt.Np2DArrayComplex64],
 ) -> list[qiskit.circuit.library.UnitaryGate]:
     # this implicitly checks for the unitarity of the G matrices
     return [qiskit.circuit.library.UnitaryGate(Gi) for Gi in G]
 
 
 def multi_layered_circuit_for_non_approximated(
-    psi: complex_array, number_of_layers: int
+    psi: npt.NDArray[np.complexfloating], number_of_layers: int, atol: float = 1e-8
 ) -> qiskit.QuantumCircuit:
     # check for normalization of psi
     if not np.isclose(np.linalg.norm(psi), 1.0):
@@ -116,9 +125,16 @@ def multi_layered_circuit_for_non_approximated(
     current_psi = np.copy(psi)
     current_psi = current_psi / np.linalg.norm(current_psi)
 
+    # zero state
+    zero_state = np.zeros(len(psi), dtype=np.complex128)
+    zero_state[0] = 1
+
     # iteratively construct the layers
     layers = []
     for j in range(number_of_layers):
+        if np.linalg.norm(current_psi - zero_state) < atol:
+            break
+
         mps = bond2_mps_approximation(current_psi)
         G = G_matrices(mps)
 
@@ -129,10 +145,12 @@ def multi_layered_circuit_for_non_approximated(
                     G[i], [number_of_qubits - 1 - i - 1, number_of_qubits - 1 - i]
                 )
             elif G[i].shape == (2, 2):
-                current_layer_circuit.unitary(G[i], number_of_qubits - 1 - i)
+                current_layer_circuit.unitary(G[i], number_of_qubits - 1 - i)  # type: ignore
         current_layer_circuit.unitary(G[-1], [0])
 
-        unitary = qiskit.quantum_info.Operator.from_circuit(current_layer_circuit).data
+        unitary: pdnt.Np2DArrayComplex64 = qiskit.quantum_info.Operator.from_circuit(
+            current_layer_circuit
+        ).data  # type: ignore
 
         current_psi = unitary.conjugate().T @ current_psi
         current_psi = current_psi / np.linalg.norm(current_psi)
@@ -180,11 +198,11 @@ def multi_layered_circuit_for_non_approximated(
 #     pass
 
 
-# def multilayer_mpo_matrices_for_non_approximated_state(
-#     psi: complex_array, max_number_of_layers: int, atol: float = 1e-8
-# ) -> npt.NDArray[np.complexfloating]:
-#     # Start with the zero state
-#     current_psi = np.zeros(len(psi))
-#     current_psi[0] = 1
+def multilayer_mpo_matrices_for_non_approximated_state(
+    psi: pdnt.Np1DArray, max_number_of_layers: int, atol: float = 1e-8
+) -> npt.NDArray[np.complexfloating]:
+    # Start with the zero state
+    current_psi = np.zeros(len(psi))
+    current_psi[0] = 1
 
-#     raise NotImplementedError
+    raise NotImplementedError

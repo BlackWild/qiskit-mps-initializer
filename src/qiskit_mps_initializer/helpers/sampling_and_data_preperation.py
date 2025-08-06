@@ -2,10 +2,10 @@ from collections.abc import Callable
 from typing import Literal
 
 import numpy as np
+import numpy.typing as npt
+import pydantic_numpy.typing as pdnt
 import scipy
 import sympy
-
-from qiskit_mps_initializer.utils.types import complex_array
 
 # custom types
 
@@ -21,7 +21,7 @@ def expression_to_array(
     sampling_period: float,
     number_of_indices: int,
     sampling_type: Sampling_Type,
-) -> complex_array:
+) -> pdnt.Np1DArrayComplex128:
     # check if number_of_indices is a power of 2
     if not (number_of_indices & (number_of_indices - 1) == 0):
         raise ValueError("number_of_indices must be a power of 2")
@@ -58,7 +58,7 @@ def position_func_to_array(
     delta_x: float,
     number_of_samples: int,
     sampling_type: Sampling_Type,
-) -> complex_array:
+) -> pdnt.Np1DArrayComplex128:
     # check if number_of_samples is a power of 2
     if not (number_of_samples & (number_of_samples - 1) == 0):
         raise ValueError("number_of_samples must be a power of 2")
@@ -81,7 +81,7 @@ def momentum_func_to_array(
     delta_x: float,
     number_of_samples: int,
     sampling_type: Sampling_Type,
-) -> complex_array:
+) -> pdnt.Np1DArrayComplex128:
     # check if number_of_samples is a power of 2
     if not (number_of_samples & (number_of_samples - 1) == 0):
         raise ValueError("number_of_samples must be a power of 2")
@@ -107,7 +107,7 @@ def non_normalized_wavefunction_to_statevector(
     delta_x: float,
     number_of_samples: int,
     sampling_type: Sampling_Type,
-) -> complex_array:
+) -> pdnt.Np1DArrayComplex128:
     # check if number_of_samples is a power of 2
     if not (number_of_samples & (number_of_samples - 1) == 0):
         raise ValueError("number_of_samples must be a power of 2")

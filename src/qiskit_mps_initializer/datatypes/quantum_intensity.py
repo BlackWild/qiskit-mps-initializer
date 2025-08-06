@@ -1,5 +1,7 @@
 """QuantumIntensity."""
 
+import numpy as np
+import numpy.typing as npt
 import pydantic as pd
 import pydantic_numpy.model as pdnm
 import pydantic_numpy.typing as pdnt
@@ -10,8 +12,6 @@ from qiskit_mps_initializer.datatypes import QuantumState
 from qiskit_mps_initializer.helpers.extractors import (
     extract_alpha_and_state_from_intensity_signal,
 )
-from qiskit_mps_initializer.utils.types import real_array
-
 
 class QuantumIntensity(pdnm.NumpyModel):
     """Represents an intensity signal."""
@@ -23,10 +23,10 @@ class QuantumIntensity(pdnm.NumpyModel):
     """The alpha parameter of the intensity signal."""
 
     @classmethod
-    def from_dense_data(cls, data: real_array) -> "QuantumIntensity":
+    def from_dense_data(cls, data: npt.ArrayLike) -> "QuantumIntensity":
         """Initializes a QuantumIntensity from the given dense data."""
-
-        alpha, state_data = extract_alpha_and_state_from_intensity_signal(data)
+        converted_data = np.array(data, dtype=np.float64)
+        alpha, state_data = extract_alpha_and_state_from_intensity_signal(converted_data)
         state = QuantumState.from_dense_data(data=state_data, normalize=False)
 
         return cls(state=state, alpha=alpha)

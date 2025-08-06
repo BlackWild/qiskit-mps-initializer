@@ -1,6 +1,7 @@
 """Test the MPS helper functions."""
 
 import numpy as np
+import numpy.typing as npt
 import qiskit
 import qiskit.quantum_info
 import quimb as qu
@@ -36,16 +37,17 @@ def test_bond2_mps_approximation(number_of_sites: int) -> None:
     assert np.allclose(random_mps_data, approximated_data)
 
 
-@given(number_of_sites=st.integers(min_value=2, max_value=8))
-def test_mps_index_permutation(number_of_sites: int) -> None:
-    random_mps_state = qtn.MPS_rand_state(
-        L=number_of_sites, bond_dim=2, dtype="complex128", normalize=True
-    )
-    random_mps_data = random_mps_state.to_dense()
+# TODO: test wether the indices are in correct order via internal quimb methods
+# @given(number_of_sites=st.integers(min_value=2, max_value=8))
+# def test_mps_index_permutation(number_of_sites: int) -> None:
+#     random_mps_state = qtn.MPS_rand_state(
+#         L=number_of_sites, bond_dim=2, dtype="complex128", normalize=True
+#     )
+#     random_mps_data = random_mps_state.to_dense()
 
-    tensor = bond2_mps_approximation(random_mps_data)
+#     tensor = bond2_mps_approximation(random_mps_data)
 
-    # tensor.inds
+#     tensor.inner_inds
 
 
 @given(number_of_sites=st.sampled_from([2, 3, 4, 5]))
@@ -83,7 +85,7 @@ def test_G_matrices_for_bond2(number_of_sites: int):
                 G[i], [number_of_sites - 1 - i - 1, number_of_sites - 1 - i]
             )
         elif G[i].shape == (2, 2):
-            circuit.unitary(G[i], number_of_sites - 1 - i)
+            circuit.unitary(G[i], [number_of_sites - 1 - i])
     circuit.unitary(G[-1], [0])
 
     simulated_state = simulate_quantum_info(circuit)
@@ -92,5 +94,7 @@ def test_G_matrices_for_bond2(number_of_sites: int):
 
 
 # TODO: Work on this
-# def test_multilayered_circuit(psi, max_number_of_layers, atol):
+# def test_multilayered_circuit(
+#     psi: npt.ArrayLike, max_number_of_layers: int, atol: float
+# ):
 #     pass

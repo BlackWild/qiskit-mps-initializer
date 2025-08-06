@@ -1,6 +1,7 @@
 """QuantumState."""
 
 import numpy as np
+import numpy.typing as npt
 import pydantic as pd
 import pydantic_numpy.model as pdnm
 import pydantic_numpy.typing as pdnt
@@ -10,8 +11,6 @@ import qiskit.circuit
 from qiskit_mps_initializer.helpers.mps_technique import (
     multi_layered_circuit_for_non_approximated,
 )
-from qiskit_mps_initializer.utils.types import complex_array
-
 
 class QuantumState(pdnm.NumpyModel):
     """Represents a quantum state."""
@@ -21,7 +20,7 @@ class QuantumState(pdnm.NumpyModel):
 
     @classmethod
     def from_dense_data(
-        cls, data: complex_array, normalize: bool = False
+        cls, data: npt.ArrayLike, normalize: bool = False
     ) -> "QuantumState":
         """Initializes the QuantumState from the given dense data."""
 

@@ -1,11 +1,10 @@
 import numpy as np
 import numpy.typing as npt
-
-from qiskit_mps_initializer.utils.types import real_array
+import pydantic_numpy.typing as pdnt
 
 
 def extract_alpha_and_state_from_intensity_signal(
-    f: real_array,
+    f: pdnt.Np1DArrayFp64,
 ) -> tuple[float, npt.NDArray[np.complex128]]:
     """Extracts the alpha and the state from the intensity signal."""
 
