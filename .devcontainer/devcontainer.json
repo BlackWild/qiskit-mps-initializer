@@ -16,7 +16,8 @@
         "ms-azuretools.vscode-docker",
         "streetsidesoftware.code-spell-checker",
         "esbenp.prettier-vscode",
-        "Codeium.codeium"
+        "Codeium.codeium",
+        "Gruntfuggly.todo-tree"
       ]
     }
   }
