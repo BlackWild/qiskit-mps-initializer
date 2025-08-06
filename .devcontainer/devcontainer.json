@@ -17,7 +17,8 @@
         "streetsidesoftware.code-spell-checker",
         "esbenp.prettier-vscode",
         "Codeium.codeium",
-        "Gruntfuggly.todo-tree"
+        "Gruntfuggly.todo-tree",
+        "ms-toolsai.jupyter"
       ]
     }
   }
