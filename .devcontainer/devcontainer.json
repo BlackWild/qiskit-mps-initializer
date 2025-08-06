@@ -1,21 +1,23 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "Python",
-    // Use the Dockerfile. More info: https://containers.dev/guide/dockerfile
-    "build": {
-        // Path is relative to the devcontainer.json file.
-        "dockerfile": "Dockerfile"
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "EditorConfig.EditorConfig",
-                "charliermarsh.ruff",
-                "tamasfe.even-better-toml",
-                "github.vscode-github-actions",
-                "ms-azuretools.vscode-docker",
-                "streetsidesoftware.code-spell-checker"
-            ]
-        }
+  "name": "Python",
+  // Use the Dockerfile. More info: https://containers.dev/guide/dockerfile
+  "build": {
+    // Path is relative to the devcontainer.json file.
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-docker",
+        "streetsidesoftware.code-spell-checker",
+        "esbenp.prettier-vscode",
+        "Codeium.codeium"
+      ]
     }
+  }
 }
