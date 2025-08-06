@@ -30,6 +30,14 @@ Because the nature of this project is somehow that it involves lots of calculati
 
 ## Development notes
 
+### Type hints
+
+- I started with `strict` typechecking enabled in `pyrightconfig.json` but gave up on it because python ecosystem is not ready for proper type annotating yet.
+- I now try to annotate input and outputs of functions as much as possible.
+- when type-annotating functions, make sure you use `npt.ArrayLike` for inputs to support widest possible input types compatible with numpy arrays.
+- and at the output of functions, use `npt.NDArray[dtype]` to specify the most exact output type.
+- internally, feel free to use any other type such as `quimb.core.qarray`.
+
 ### Pydantic
 
 - it seems defining custom `__init__()` functions for the pydantic models is not the best idea because it messes with the validation procedure of pydantic [Link](https://docs.pydantic.dev/latest/concepts/models/#model-signature). Instead, do not define custom constructors as `__init__()` but `@classmethod`s.
