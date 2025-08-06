@@ -12,6 +12,7 @@ from qiskit_mps_initializer.helpers.mps_technique import (
     multi_layered_circuit_for_non_approximated,
 )
 
+
 class QuantumState(pdnm.NumpyModel):
     """Represents a quantum state."""
 
@@ -64,7 +65,7 @@ class QuantumState(pdnm.NumpyModel):
         Returns:
             QuantumCircuit: The MPS initializer circuit for the quantum state as a qiskit circuit.
         """
-        circuit = multi_layered_circuit_for_non_approximated(
-            self.wavefunction, number_of_layers=number_of_layers
+        circuit, _ = multi_layered_circuit_for_non_approximated(
+            self.wavefunction, max_number_of_layers=number_of_layers
         )
         return circuit

@@ -38,12 +38,10 @@ def bond2_mps_approximation(psi: npt.ArrayLike) -> qtn.MatrixProductState:
 def G_matrices(mps: qtn.MatrixProductState) -> list[pdnt.Np2DArrayComplex64]:
     # make sure the maximum bond dimension is maximally 2 or there is only one tensor
     max_bond = mps.max_bond()
-    if max_bond == None: # there is no bond therefore there is only one site
+    if max_bond is None:  # there is no bond therefore there is only one site
         raise ValueError("This function does not support one-site MPS yet.")
     if max_bond > 2:
-        raise ValueError(
-            "The maximum bond dimension of the MPS must be 2"
-        )
+        raise ValueError("The maximum bond dimension of the MPS must be 2")
 
     # expand the bond dimension to 2 for easier handling of edge cases (when a bond dimension is 1)
     mps.expand_bond_dimension(2)
@@ -68,15 +66,13 @@ def G_matrices(mps: qtn.MatrixProductState) -> list[pdnt.Np2DArrayComplex64]:
             Ai_a_0 = Ai_a_0_data.reshape(4, 1)
             Ai_a_1_data: pdnt.Np2DArrayComplex64 = mps[i].data[1, :, :].copy()  # type: ignore
             Ai_a_1 = Ai_a_1_data.reshape(4, 1)
-            Gi_incomplete = np.column_stack((Ai_a_0, Ai_a_1))
+
+            if np.allclose(Ai_a_1, [0, 0, 0, 0]):
+                Gi_incomplete = Ai_a_0
+            else:
+                Gi_incomplete = np.column_stack((Ai_a_0, Ai_a_1))
 
             null_space = scipy.linalg.null_space(Gi_incomplete.T)
-
-            # if Ai.data.shape[0] == 2:
-            #     Ai_a_1 = Ai.data[1, :, :].flatten()
-            #     Gi_incomplete = np.array([Ai_a_0, Ai_a_1])
-            # else:
-            #     Gi_incomplete = np.array([Ai_a_0])
 
             Gi = np.column_stack((Gi_incomplete, null_space.conjugate()))
 
@@ -108,8 +104,8 @@ def one_layer_gates_for_bond2_approximated(
 
 
 def multi_layered_circuit_for_non_approximated(
-    psi: npt.NDArray[np.complexfloating], number_of_layers: int, atol: float = 1e-8
-) -> qiskit.QuantumCircuit:
+    psi: pdnt.Np1DArrayComplex128, max_number_of_layers: int | None, atol: float = 1e-5
+) -> tuple[qiskit.QuantumCircuit, bool]:
     # check for normalization of psi
     if not np.isclose(np.linalg.norm(psi), 1.0):
         raise ValueError(
@@ -119,7 +115,7 @@ def multi_layered_circuit_for_non_approximated(
 
     number_of_qubits = int(np.log2(len(psi)))
     if len(psi) != 2**number_of_qubits:
-        raise ValueError("The state vector must have a size of 2^n.")
+        raise ValueError("The state vector must have of size of 2^n.")
 
     # create a copy
     current_psi = np.copy(psi)
@@ -131,9 +127,17 @@ def multi_layered_circuit_for_non_approximated(
 
     # iteratively construct the layers
     layers = []
-    for j in range(number_of_layers):
+    did_hit_atol = False
+    number_of_layers = 0
+    while True:
         if np.linalg.norm(current_psi - zero_state) < atol:
+            did_hit_atol = True
             break
+        if max_number_of_layers is not None and number_of_layers > max_number_of_layers:
+            break
+
+        print("Current error: " + str(np.linalg.norm(current_psi - zero_state)))
+        print("Current number of layers: " + str(number_of_layers))
 
         mps = bond2_mps_approximation(current_psi)
         G = G_matrices(mps)
@@ -145,7 +149,7 @@ def multi_layered_circuit_for_non_approximated(
                     G[i], [number_of_qubits - 1 - i - 1, number_of_qubits - 1 - i]
                 )
             elif G[i].shape == (2, 2):
-                current_layer_circuit.unitary(G[i], number_of_qubits - 1 - i)  # type: ignore
+                current_layer_circuit.unitary(G[i], [number_of_qubits - 1 - i])
         current_layer_circuit.unitary(G[-1], [0])
 
         unitary: pdnt.Np2DArrayComplex64 = qiskit.quantum_info.Operator.from_circuit(
@@ -156,6 +160,7 @@ def multi_layered_circuit_for_non_approximated(
         current_psi = current_psi / np.linalg.norm(current_psi)
 
         layers.append(current_layer_circuit)
+        number_of_layers += 1
 
     # the order of the construction of the layers is the reverse of the order of the application of them in the implementation
     layers.reverse()
@@ -163,46 +168,4 @@ def multi_layered_circuit_for_non_approximated(
     for layer in layers:
         circuit.compose(layer, inplace=True)
 
-    print(
-        "DEBUG LOG: MPS initializer generator was called. This log is for the purpose of reducing the number of calls to this function."
-    )
-
-    return circuit
-
-
-# def multilayer_qiskit_initializer_circuit_for_non_approximated_state(
-#     target_psi: npt.NDArray[np.complexfloating],
-#     max_number_of_layers: int,
-#     atol: float = 1e-8,
-# ) -> qiskit.circuit.QuantumCircuit:
-#     qubit_num = np.log2(len(target_psi))
-#     assert qubit_num.is_integer(), "The state vector must have a size of 2^n."
-
-#     circuit = qiskit.QuantumCircuit(qubit_num)
-
-#     current_psi = np.zeros(len(target_psi))
-#     current_psi[0] = 1
-
-#     while np.linalg.norm(current_psi - target_psi) > atol:
-#         mps = bond2_mps_approximation(current_psi)
-#         G_matrices = G_matrices(mps)
-
-#         pass
-#         # current_psi = np.dot(current_psi, G)
-#         # circuit.append(one_layer_gates_for_bond2_approximated(G), range(qubit_num))
-
-#     return circuit
-
-
-# def recursive():
-#     pass
-
-
-def multilayer_mpo_matrices_for_non_approximated_state(
-    psi: pdnt.Np1DArray, max_number_of_layers: int, atol: float = 1e-8
-) -> npt.NDArray[np.complexfloating]:
-    # Start with the zero state
-    current_psi = np.zeros(len(psi))
-    current_psi[0] = 1
-
-    raise NotImplementedError
+    return circuit, did_hit_atol

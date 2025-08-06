@@ -46,14 +46,10 @@ def test_QuantumState_mps_circuit_manual() -> None:
     circuit = state.generate_mps_initializer_circuit(number_of_layers=1)
     assert isinstance(circuit, qiskit.QuantumCircuit)
 
-    # TODO: should now actually check for the result of the initializer circuit
     result = simulate_statevector(circuit)
 
     expected_data = data / np.linalg.norm(data)
     result_data = result.data
-
-    print(result_data)
-    print(expected_data)
 
     assert np.allclose(result_data, expected_data)
 
