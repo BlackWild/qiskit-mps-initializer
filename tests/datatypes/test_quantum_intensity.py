@@ -21,8 +21,6 @@ from qiskit_mps_initializer.datatypes import QuantumIntensity, QuantumState
 def test_QuantumIntensity_using_nparrays(data: npt.NDArray[np.floating]) -> None:
     """Test the QuantumIntensity class using random numpy arrays."""
 
-    # print(data)
-
     # Create an instance of PhasePreparedSignal
     intensity = QuantumIntensity.from_dense_data(data)
 
