@@ -136,9 +136,6 @@ def multi_layered_circuit_for_non_approximated(
         if max_number_of_layers is not None and number_of_layers > max_number_of_layers:
             break
 
-        print("Current error: " + str(np.linalg.norm(current_psi - zero_state)))
-        print("Current number of layers: " + str(number_of_layers))
-
         mps = bond2_mps_approximation(current_psi)
         G = G_matrices(mps)
 

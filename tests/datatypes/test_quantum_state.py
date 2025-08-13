@@ -81,9 +81,6 @@ def test_QuantumState_mps_circuit_manual() -> None:
 #     expected_data = data / np.linalg.norm(data)
 #     result_data = result.data
 
-#     print(result_data)
-#     print(expected_data)
-
 #     assert np.allclose(result_data, expected_data)
 
 #     # TODO: and probably also modify the initializer function to work with null number_of_layers so that it iterates as many times as needed to get to the final bond-2-approximate-able state, namely, to the last layer having at least one two-qubit gate
