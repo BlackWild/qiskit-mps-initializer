@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qiskit-mps-initializer"
-version = "0.2.3"
+version = "0.2.4"
 description = "Wavefunction initializers for Qiskit based on matrix product states (MPS)"
 readme = "README.md"
 authors = [
