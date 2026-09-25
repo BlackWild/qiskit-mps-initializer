@@ -15,6 +15,9 @@ nav:
           - api/datatypes/quantum_state.md
           - api/datatypes/quantum_intensity.md
 
+markdown_extensions:
+  - admonition
+
 plugins:
   - mkdocstrings:
       handlers:
