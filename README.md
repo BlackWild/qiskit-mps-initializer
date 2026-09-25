@@ -5,7 +5,17 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qiskit-mps-initializer)
 
 > [!WARNING]
-> This repository is deprecated. Development has moved to the [BlackWild/qiu monorepo](https://github.com/BlackWild/qiu).
+> **This package is deprecated** and no longer maintained. It is continued as
+> [`qiu-mps-initializer`](https://pypi.org/project/qiu-mps-initializer/) in the
+> [qiu monorepo](https://github.com/BlackWild/qiu):
+>
+> ```bash
+> pip install qiu-mps-initializer
+> ```
+>
+> The API changed in the move, e.g. `QuantumState` became Qiskit's `Statevector`, and
+> `mps_state_preparation` replaced the initializer methods; see
+> [the changes from version 0.2](https://blackwild.github.io/qiu/qiu-mps-initializer/user-guide/#changes-from-version-02).
 
 This package provides extra tools on Qiskit enabling you to initialize wavefunctions on a quantum computer using techniques based on matrix product states (MPS).
 

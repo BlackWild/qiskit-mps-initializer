@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qiskit-mps-initializer"
-version = "0.2.4"
-description = "Wavefunction initializers for Qiskit based on matrix product states (MPS)"
+version = "0.2.5"
+description = "Deprecated: continued as qiu-mps-initializer. Wavefunction initializers for Qiskit based on matrix product states (MPS)"
 readme = "README.md"
 authors = [
     { name = "Siavash Davani", email = "siavash.davani@uni-jena.de" }
@@ -13,7 +13,7 @@ authors = [
 license = "MIT"
 license-files = ["LICENSE"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 7 - Inactive",
     "Intended Audience :: Science/Research",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
@@ -34,8 +34,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/BlackWild/qiskit-mps-initializer"
-Documentation = "https://blackwild.github.io/qiskit-mps-initializer/"
+Homepage = "https://github.com/BlackWild/qiu/tree/master/packages/qiu-mps-initializer"
+Documentation = "https://blackwild.github.io/qiu/qiu-mps-initializer/"
+"Successor on PyPI" = "https://pypi.org/project/qiu-mps-initializer/"
+"Former repository" = "https://github.com/BlackWild/qiskit-mps-initializer"
 
 [dependency-groups]
 dev = [
